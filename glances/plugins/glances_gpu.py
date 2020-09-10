@@ -203,7 +203,7 @@ class Plugin(GlancesPlugin):
             else:
                 unit = 'C'
                 if args.fahrenheit:
-                    value = to_fahrenheit(i['value'])
+                    mean_temperature = to_fahrenheit(mean_temperature)
                     unit = 'F'
                 mean_temperature_msg = '{:>3.0f}{}'.format(mean_temperature,
                                                            unit)
@@ -292,7 +292,8 @@ def get_device_name(device_handle):
 def get_mem(device_handle):
     """Get GPU device memory consumption in percent."""
     try:
-        return pynvml.nvmlDeviceGetUtilizationRates(device_handle).memory
+        memory_info = pynvml.nvmlDeviceGetMemoryInfo(device_handle)
+        return memory_info.used * 100.0 / memory_info.total
     except pynvml.NVMLError:
         return None
 

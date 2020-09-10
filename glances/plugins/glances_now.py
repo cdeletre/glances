@@ -19,9 +19,9 @@
 
 """Now (current date) plugin."""
 
-from time import tzname, localtime
-from datetime import datetime
+from time import tzname, localtime, strftime
 
+from glances.globals import WINDOWS
 from glances.plugins.glances_plugin import GlancesPlugin
 
 
@@ -48,12 +48,11 @@ class Plugin(GlancesPlugin):
     def update(self):
         """Update current date/time."""
         # Had to convert it to string because datetime is not JSON serializable
-        self.stats = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        # Add the time zone (issue #1249 and issue #1337)
-        if 'tmzone' in localtime():
-            self.stats += ' {}'.format(localtime().tm_zone)
-        elif len(tzname) > 0:
-            self.stats += ' {}'.format(tzname[1])
+        # Add the time zone (issue #1249 / #1337 / #1598)
+        if (len(tzname[1]) > 6):
+            self.stats = strftime('%Y-%m-%d %H:%M:%S %z')
+        else:
+            self.stats = strftime('%Y-%m-%d %H:%M:%S %Z')
 
         return self.stats
 
